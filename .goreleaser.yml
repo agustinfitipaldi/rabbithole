@@ -15,9 +15,7 @@ builds:
       - amd64
 
 archives:
-  - format_overrides:
-      - goos: linux
-        format: tar.gz
+  - format: tar.gz
     name_template: >-
       {{ .ProjectName }}_
       {{- title .Os }}_
@@ -48,7 +46,7 @@ nfpms:
       - xdotool
       - x11-utils
     contents:
-      - src: ./rabbithole
+      - src: "{{ .Binary }}"
         dst: /usr/local/bin/rabbithole
         file_info:
           mode: 0755
