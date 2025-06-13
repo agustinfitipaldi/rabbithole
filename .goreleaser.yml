@@ -1,3 +1,5 @@
+version: 2
+
 project_name: rabbithole
 
 before:
@@ -11,15 +13,11 @@ builds:
       - linux
     goarch:
       - amd64
-      - arm64
-      - 386
-    ignore:
-      - goos: linux
-        goarch: 386
-        # Skip 32-bit builds for simplicity, most modern Linux is 64-bit
 
 archives:
-  - format: tar.gz
+  - format_overrides:
+      - goos: linux
+        format: tar.gz
     name_template: >-
       {{ .ProjectName }}_
       {{- title .Os }}_
@@ -57,9 +55,6 @@ nfpms:
 
 checksum:
   name_template: 'checksums.txt'
-
-snapshot:
-  name_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
