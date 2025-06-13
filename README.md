@@ -86,7 +86,6 @@ sxhkd &            # Start hotkey daemon
 
 - `Ctrl+Space`: Search with selected text (defaults to manual if nothing selected)
 - `Ctrl+Shift+Space`: Force search with manual input (even if text selected)
-- `Escape`: Closes window in focus if its been tracked as a research window
 
 ### Search Engine Management
 
@@ -158,9 +157,6 @@ All searches are logged to SQLite with the following structure:
 - Search query and engine information
 - Trigger method (selection vs manual)
 - Timestamp and session tracking
-
-**research_windows table:**
-- Active window tracking for management
 
 ## System Requirements
 

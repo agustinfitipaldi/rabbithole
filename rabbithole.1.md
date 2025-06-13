@@ -16,7 +16,6 @@ rabbithole - Fast research tool with auto-copy and search engine routing
 **rabbithole** **remove-engine** *KEY*  
 **rabbithole** **edit-engine** *OLD-KEY* *NAME* *URL* *NEW-KEY*  
 **rabbithole** **setup**  
-**rabbithole** **close**  
 
 # DESCRIPTION
 
@@ -91,14 +90,9 @@ Update an existing search engine's properties. All four parameters are required:
 Generate **sxhkd(1)** configuration for rabbithole hotkeys. Creates **~/.config/sxhkd/sxhkdrc** with the following bindings:
 
 - **Ctrl+Space**: Search with selected text
-- **Ctrl+Shift+Space**: Search with manual input  
-- **Escape**: Close active research window
+- **Ctrl+Shift+Space**: Search with manual input
 
 After running setup, start **sxhkd** manually or add to your window manager startup.
-
-## close
-
-Close the currently active research window if it's tracked by rabbithole. This command is typically triggered by the **Escape** hotkey.
 
 # CONFIGURATION
 
@@ -149,7 +143,6 @@ Each engine requires:
 {
   "behavior": {
     "auto_copy_delay_ms": 75,
-    "max_windows": 5,
     "window_width": 650,
     "window_height": 900,
     "firefox_profile": "",
@@ -161,7 +154,6 @@ Each engine requires:
 ```
 
 - **auto_copy_delay_ms**: Legacy setting (no longer used)
-- **max_windows**: Maximum research windows before cleanup
 - **window_width/height**: Dimensions for research windows
 - **firefox_profile**: Optional Firefox profile for isolation
 - **selection_method**: Selection capture behavior
@@ -206,14 +198,12 @@ sxhkd &
 
 # WINDOW MANAGEMENT
 
-Research windows are automatically positioned on the right side of the screen and tracked for session management. Windows are:
+Research windows are automatically positioned on the right side of the screen. Windows are:
 
 - Positioned at calculated coordinates based on screen size
-- Limited to **max_windows** count with automatic cleanup  
-- Tracked in the database for the **close** command
 - Given a distinct window class for identification
 
-The tool uses **wmctrl(1)** and **xdotool(1)** for window manipulation.
+The tool uses **wmctrl(1)** and **xdotool(1)** for window positioning.
 
 # DATABASE SCHEMA
 
@@ -228,9 +218,6 @@ Search data is stored in SQLite with the following structure:
 - **timestamp**: When search was performed
 - **session_id**: Daily session identifier
 
-## research_windows table  
-- **window_id**: X11 window ID (hex format)
-- **created_at**: Window creation timestamp
 
 # FILES
 
@@ -311,8 +298,6 @@ rabbithole edit-engine "k" "Kagi Search" "https://kagi.com/search?q=%s" "k"
 1. **Press Ctrl+Shift+Space** (skip auto-capture)
 2. **Type/paste query** manually in dmenu prompt
 3. **Choose engine** and continue...
-
-**Close research windows:** Press **Escape** in any research window.
 
 # EXIT STATUS
 

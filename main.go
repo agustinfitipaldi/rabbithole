@@ -422,161 +422,14 @@ func openBrowserInSideWindow(searchURL, query string) error {
 			xPos, yPos, config.Behavior.WindowWidth, config.Behavior.WindowHeight)
 	}
 	
-	// Track this as a research window
-	if err := addResearchWindow(firefoxWID); err != nil {
-		log.Printf("Warning: couldn't track research window: %v", err)
-	}
 	
 	return nil
 }
 
-func addResearchWindow(wid string) error {
-	// Store research window ID in database (normalized to hex format)
-	if db == nil {
-		return fmt.Errorf("database not initialized")
-	}
-	
-	normalizedWID := normalizeWindowID(wid)
-	_, err := db.Exec("INSERT OR REPLACE INTO research_windows (window_id, created_at) VALUES (?, ?)", 
-		normalizedWID, time.Now())
-	return err
-}
 
-func getResearchWindows() ([]string, error) {
-	if db == nil {
-		return nil, fmt.Errorf("database not initialized")
-	}
-	
-	rows, err := db.Query("SELECT window_id FROM research_windows")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	
-	var wids []string
-	for rows.Next() {
-		var wid string
-		if err := rows.Scan(&wid); err != nil {
-			continue
-		}
-		wids = append(wids, wid)
-	}
-	return wids, nil
-}
 
-func cleanupDeadWindows() error {
-	if db == nil {
-		return fmt.Errorf("database not initialized")
-	}
-	
-	// Get all stored window IDs
-	rows, err := db.Query("SELECT window_id FROM research_windows")
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-	
-	var storedWIDs []string
-	for rows.Next() {
-		var wid string
-		if err := rows.Scan(&wid); err != nil {
-			continue
-		}
-		storedWIDs = append(storedWIDs, wid)
-	}
-	
-	// Get current window list to check which ones still exist
-	out, err := exec.Command("wmctrl", "-l").Output()
-	if err != nil {
-		return fmt.Errorf("couldn't get window list: %w", err)
-	}
-	
-	// Extract current window IDs
-	currentWIDs := make(map[string]bool)
-	lines := strings.Split(string(out), "\n")
-	for _, line := range lines {
-		if line != "" {
-			parts := strings.Fields(line)
-			if len(parts) > 0 {
-				currentWIDs[parts[0]] = true
-			}
-		}
-	}
-	
-	// Remove dead windows from database
-	for _, wid := range storedWIDs {
-		if !currentWIDs[wid] {
-			if err := removeResearchWindow(wid); err != nil {
-				log.Printf("Warning: couldn't remove dead window %s: %v", wid, err)
-			} else {
-				log.Printf("Cleaned up dead research window: %s", wid)
-			}
-		}
-	}
-	
-	return nil
-}
 
-func removeResearchWindow(wid string) error {
-	if db == nil {
-		return fmt.Errorf("database not initialized")
-	}
-	
-	normalizedWID := normalizeWindowID(wid)
-	_, err := db.Exec("DELETE FROM research_windows WHERE window_id = ?", normalizedWID)
-	return err
-}
 
-func closeActiveResearchWindow() error {
-	// Find the currently active window
-	out, err := exec.Command("xdotool", "getactivewindow").Output()
-	if err != nil {
-		log.Printf("Failed to get active window with xdotool: %v", err)
-		return fmt.Errorf("couldn't get active window (no active window or xdotool failed): %w", err)
-	}
-	
-	activeWID := strings.TrimSpace(string(out))
-	normalizedActiveWID := normalizeWindowID(activeWID)
-	
-	// Clean up dead windows first
-	if err := cleanupDeadWindows(); err != nil {
-		log.Printf("Warning: couldn't cleanup dead windows: %v", err)
-	}
-	
-	// Check if active window is tracked as a research window
-	if db == nil {
-		return fmt.Errorf("database not initialized")
-	}
-	
-	var count int
-	err = db.QueryRow("SELECT COUNT(*) FROM research_windows WHERE window_id = ?", normalizedActiveWID).Scan(&count)
-	if err != nil {
-		return fmt.Errorf("couldn't check research window status: %w", err)
-	}
-	
-	if count == 0 {
-		// Silently fail - this is normal when ESC is pressed on non-research windows
-		return nil
-	}
-	
-	// Get window name for logging
-	nameOut, _ := exec.Command("xdotool", "getwindowname", activeWID).Output()
-	windowName := strings.TrimSpace(string(nameOut))
-	
-	// Close the window
-	cmd := exec.Command("xdotool", "windowclose", activeWID)
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to close window: %w", err)
-	}
-	
-	// Remove from tracking
-	if err := removeResearchWindow(activeWID); err != nil {
-		log.Printf("Warning: couldn't remove window from tracking: %v", err)
-	}
-	
-	log.Printf("Closed research window: %s (%s)", normalizedActiveWID, windowName)
-	return nil
-}
 
 func initLogging() error {
 	usr, err := user.Current()
@@ -624,19 +477,8 @@ func initDatabase() error {
 	);
 	`
 
-	createResearchWindowsTable := `
-	CREATE TABLE IF NOT EXISTS research_windows (
-		window_id TEXT PRIMARY KEY,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-	);
-	`
-
 	if _, err := db.Exec(createSearchesTable); err != nil {
 		return fmt.Errorf("failed to create searches table: %w", err)
-	}
-
-	if _, err := db.Exec(createResearchWindowsTable); err != nil {
-		return fmt.Errorf("failed to create research_windows table: %w", err)
 	}
 
 	return nil
@@ -746,11 +588,7 @@ ctrl + space
 
 ctrl + shift + space
     %s search --empty
-
-# Close active research window
-Escape
-    %s close
-`, execPath, execPath, execPath)
+`, execPath, execPath)
 	
 	if err := os.WriteFile(configPath, []byte(configContent), 0644); err != nil {
 		return fmt.Errorf("failed to write sxhkd config: %w", err)
@@ -763,7 +601,6 @@ Escape
 	fmt.Println("\n⌨️  Hotkeys:")
 	fmt.Println("  Ctrl+Space: Search selected text")
 	fmt.Println("  Ctrl+Shift+Space: Manual search")
-	fmt.Println("  Escape: Close active research window")
 	
 	return nil
 }
@@ -820,17 +657,6 @@ func createRootCmd() *cobra.Command {
 		},
 	}
 
-	closeCmd := &cobra.Command{
-		Use:   "close",
-		Short: "Close the active research window",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// Hot-reload config and ensure DB is ready
-			if err := ensureConfigAndDB(); err != nil {
-				return err
-			}
-			return closeActiveResearchWindow()
-		},
-	}
 
 	addEngineCmd := &cobra.Command{
 		Use:   "add-engine [name] [url] [key]",
@@ -1037,7 +863,7 @@ func createRootCmd() *cobra.Command {
 		},
 	}
 
-	rootCmd.AddCommand(searchCmd, setupCmd, closeCmd, addEngineCmd, listEnginesCmd, removeEngineCmd, editEngineCmd, debugSelectionsCmd)
+	rootCmd.AddCommand(searchCmd, setupCmd, addEngineCmd, listEnginesCmd, removeEngineCmd, editEngineCmd, debugSelectionsCmd)
 	return rootCmd
 }
 

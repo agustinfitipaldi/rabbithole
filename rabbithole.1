@@ -33,10 +33,6 @@ rabbithole - Fast research tool with auto-copy and search engine routing
 .P
 .PD
 \f[B]rabbithole\f[R] \f[B]setup\f[R]
-.PD 0
-.P
-.PD
-\f[B]rabbithole\f[R] \f[B]close\f[R]
 .SH DESCRIPTION
 .PP
 \f[B]rabbithole\f[R] is a fast, lightweight Linux tool for academic
@@ -129,19 +125,9 @@ bindings:
 \f[B]Ctrl+Space\f[R]: Search with selected text
 .IP \[bu] 2
 \f[B]Ctrl+Shift+Space\f[R]: Search with manual input
-.PD 0
-.P
-.PD
-.IP \[bu] 2
-\f[B]Escape\f[R]: Close active research window
 .PP
 After running setup, start \f[B]sxhkd\f[R] manually or add to your
 window manager startup.
-.SS close
-.PP
-Close the currently active research window if it\[cq]s tracked by
-rabbithole.
-This command is typically triggered by the \f[B]Escape\f[R] hotkey.
 .SH CONFIGURATION
 .PP
 Configuration is stored in \f[B]config.json\f[R] and loaded fresh on
@@ -203,7 +189,6 @@ Each engine requires: - \f[B]name\f[R]: Display name shown in dmenu -
 {
   \[dq]behavior\[dq]: {
     \[dq]auto_copy_delay_ms\[dq]: 75,
-    \[dq]max_windows\[dq]: 5,
     \[dq]window_width\[dq]: 650,
     \[dq]window_height\[dq]: 900,
     \[dq]firefox_profile\[dq]: \[dq]\[dq],
@@ -216,8 +201,6 @@ Each engine requires: - \f[B]name\f[R]: Display name shown in dmenu -
 .fi
 .IP \[bu] 2
 \f[B]auto_copy_delay_ms\f[R]: Legacy setting (no longer used)
-.IP \[bu] 2
-\f[B]max_windows\f[R]: Maximum research windows before cleanup
 .IP \[bu] 2
 \f[B]window_width/height\f[R]: Dimensions for research windows
 .IP \[bu] 2
@@ -288,22 +271,15 @@ sxhkd &
 .SH WINDOW MANAGEMENT
 .PP
 Research windows are automatically positioned on the right side of the
-screen and tracked for session management.
+screen.
 Windows are:
 .IP \[bu] 2
 Positioned at calculated coordinates based on screen size
 .IP \[bu] 2
-Limited to \f[B]max_windows\f[R] count with automatic cleanup
-.PD 0
-.P
-.PD
-.IP \[bu] 2
-Tracked in the database for the \f[B]close\f[R] command
-.IP \[bu] 2
 Given a distinct window class for identification
 .PP
 The tool uses \f[B]wmctrl(1)\f[R] and \f[B]xdotool(1)\f[R] for window
-manipulation.
+positioning.
 .SH DATABASE SCHEMA
 .PP
 Search data is stored in SQLite with the following structure:
@@ -325,11 +301,6 @@ Search data is stored in SQLite with the following structure:
 \f[B]timestamp\f[R]: When search was performed
 .IP \[bu] 2
 \f[B]session_id\f[R]: Daily session identifier
-.SS research_windows table
-.IP \[bu] 2
-\f[B]window_id\f[R]: X11 window ID (hex format)
-.IP \[bu] 2
-\f[B]created_at\f[R]: Window creation timestamp
 .SH FILES
 .TP
 \f[B]\[ti]/.config/sxhkd/sxhkdrc\f[R]
@@ -425,9 +396,6 @@ selection) 2.
 \f[B]Press Ctrl+Shift+Space\f[R] (skip auto-capture) 2.
 \f[B]Type/paste query\f[R] manually in dmenu prompt 3.
 \f[B]Choose engine\f[R] and continue\&...
-.PP
-\f[B]Close research windows:\f[R] Press \f[B]Escape\f[R] in any research
-window.
 .SH EXIT STATUS
 .TP
 \f[B]0\f[R]
@@ -446,10 +414,6 @@ Auto-copy feature disabled due to system interference (manual entry
 required)
 .IP \[bu] 2
 X11 only - no Wayland support
-.IP \[bu] 2
-\f[B]Firefox research windows show expanded vertical tabs:\f[R] Firefox remembers sidebar state globally. If research windows open with expanded vertical tabs: (1) collapse tabs in main Firefox window, (2) close Firefox completely, (3) reopen Firefox to save collapsed state as default.
-.IP \[bu] 2
-\f[B]Research windows appear too narrow with horizontal tabs:\f[R] Firefox renders windows slightly narrower when using horizontal tabs vs vertical tabs. Enable vertical tabs for optimal sizing, or adjust \f[C]window_width\f[R] in config.json.
 .PP
 Report bugs at: <https://github.com/user/rabbithole/issues>
 .SH SEE ALSO
