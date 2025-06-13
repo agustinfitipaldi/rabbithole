@@ -7,26 +7,18 @@ before:
     - go mod tidy
 
 builds:
-  - env:
+  - id: rabbithole
+    env:
       - CGO_ENABLED=1
     goos:
       - linux
     goarch:
       - amd64
 
-archives:
-  - format: tar.gz
-    name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
-
 nfpms:
-  - id: deb
-    package_name: rabbithole
+  - package_name: rabbithole
+    builds:
+      - rabbithole
     vendor: agustinfitipaldi
     homepage: https://github.com/agustinfitipaldi/rabbithole
     maintainer: Agustin Fitipaldi <agustinfitipaldi@gmail.com>
@@ -46,17 +38,7 @@ nfpms:
       - xdotool
       - x11-utils
     contents:
-      - src: "{{ .Binary }}"
+      - src: dist/rabbithole_{{ .Os }}_{{ .Arch }}{{ with .Amd64 }}_{{ . }}{{ end }}/rabbithole
         dst: /usr/local/bin/rabbithole
         file_info:
           mode: 0755
-
-checksum:
-  name_template: 'checksums.txt'
-
-changelog:
-  sort: asc
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
