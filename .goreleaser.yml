@@ -1,0 +1,69 @@
+project_name: rabbithole
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - env:
+      - CGO_ENABLED=1
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+      - 386
+    ignore:
+      - goos: linux
+        goarch: 386
+        # Skip 32-bit builds for simplicity, most modern Linux is 64-bit
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+
+nfpms:
+  - id: deb
+    package_name: rabbithole
+    vendor: agustinfitipaldi
+    homepage: https://github.com/agustinfitipaldi/rabbithole
+    maintainer: Agustin Fitipaldi <agustinfitipaldi@gmail.com>
+    description: |
+      Linux tool for capturing text selections and routing them through search engines.
+      Provides instant access to configurable search engines with sub-50ms response time.
+      Features automatic text selection capture, dedicated research windows, and SQLite logging.
+    license: MIT
+    formats:
+      - deb
+    dependencies:
+      - sxhkd
+      - dmenu
+      - firefox
+      - xsel
+      - wmctrl
+      - xdotool
+      - x11-utils
+    contents:
+      - src: ./rabbithole
+        dst: /usr/local/bin/rabbithole
+        file_info:
+          mode: 0755
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
