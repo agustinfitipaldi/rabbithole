@@ -1,0 +1,105 @@
+{
+  "search_engines": [
+    {
+      "name": "Kagi",
+      "url": "https://kagi.com/search?q=%s",
+      "key": "k"
+    },
+    {
+      "name": "Fastmail",
+      "url": "https://app.fastmail.com/mail/search:%s",
+      "key": "f"
+    },
+    {
+      "name": "Oxford English Dictionary",
+      "url": "https://www.oed.com/search/dictionary/?scope=Entries\u0026q=%s",
+      "key": "o"
+    },
+    {
+      "name": "Webster's 1913",
+      "url": "https://www.websters1913.com/words/%s",
+      "key": "b"
+    },
+    {
+      "name": "UCSB Library",
+      "url": "https://search.library.ucsb.edu/discovery/search?query=any,contains,%s\u0026tab=Everything\u0026search_scope=DN_and_CI\u0026vid=01UCSB_INST:UCSB\u0026lang=en\u0026offset=0",
+      "key": "u"
+    },
+    {
+      "name": "Rotten Tomatoes",
+      "url": "https://www.rottentomatoes.com/search?search=%s",
+      "key": "r"
+    },
+    {
+      "name": "NZB Geek",
+      "url": "https://nzbgeek.info/geekseek.php?moviesgeekseek=1\u0026c=\u0026browseincludewords=%s",
+      "key": "n"
+    },
+    {
+      "name": "Youtube",
+      "url": "https://www.youtube.com/results?search_query=%s",
+      "key": "y"
+    },
+    {
+      "name": "HN Algolia",
+      "url": "https://hn.algolia.com/?dateRange=all\u0026page=0\u0026prefix=false\u0026query=%s\u0026sort=byPopularity\u0026type=story",
+      "key": "h"
+    },
+    {
+      "name": "Kagi Assistant",
+      "url": "https://kagi.com/search?q=%s?",
+      "key": "q"
+    },
+    {
+      "name": "What Could This Mean",
+      "url": "https://kagi.com/search?q=Explain this phrase, \"%s\"?",
+      "key": "c"
+    },
+    {
+      "name": "Economist",
+      "url": "https://www.economist.com/search?q=%s",
+      "key": "e"
+    },
+    {
+      "name": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/%s",
+      "key": "w"
+    },
+    {
+      "name": "Game Theory Tutor",
+      "url": "https://kagi.com/search?q=%s !171",
+      "key": "g"
+    },
+    {
+      "name": "Typst Documentation",
+      "url": "https://kagi.com/search?q=%s !typst",
+      "key": "t"
+    },
+    {
+      "name": "test",
+      "url": "test %s",
+      "key": "p"
+    }
+  ],
+  "interface": {
+    "launcher": "dmenu",
+    "dmenu_args": [
+      "-i",
+      "-p",
+      "Search with:"
+    ]
+  },
+  "database": {
+    "path": "/home/agustinfitipaldi/.local/share/rabbithole/searches.db"
+  },
+  "behavior": {
+    "auto_copy_delay_ms": 500,
+    "max_windows": 5,
+    "window_width": 650,
+    "window_height": 900,
+    "firefox_profile": "",
+    "selection_method": "auto",
+    "selection_timeout_ms": 1000,
+    "log_selections": false
+  }
+}

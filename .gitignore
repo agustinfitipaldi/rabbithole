@@ -1,0 +1,45 @@
+# Binaries
+rabbithole
+rabbithole.exe
+
+roadmap.md
+debug.md
+bugs.md
+
+# Go build artifacts
+*.o
+*.a
+*.so
+
+# Test binaries
+*.test
+
+# Coverage files
+*.out
+*.prof
+
+# Go workspace file
+go.work
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local development
+*.local
+.env
+
+# Database files (should be user-specific)
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log

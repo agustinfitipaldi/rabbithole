@@ -1,0 +1,12 @@
+# Rabbit Hole Investigator hotkeys
+# Super+S - Search with selected text
+"cd /home/agustinfitipaldi/dev/rabbithole && ./rabbithole search"
+  Super + s
+
+# Super+Shift+S - Empty search (manual query)
+"cd /home/agustinfitipaldi/dev/rabbithole && ./rabbithole empty"
+  Super + Shift + s
+
+# Super+R - Toggle research mode (for future v0.2)
+"cd /home/agustinfitipaldi/dev/rabbithole && ./rabbithole toggle"
+  Super + r
