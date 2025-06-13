@@ -17,8 +17,6 @@ builds:
 
 nfpms:
   - package_name: rabbithole
-    builds:
-      - rabbithole
     vendor: agustinfitipaldi
     homepage: https://github.com/agustinfitipaldi/rabbithole
     maintainer: Agustin Fitipaldi <agustinfitipaldi@gmail.com>
